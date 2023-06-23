@@ -1,47 +1,44 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
-import TheWelcome from './components/TheWelcome.vue';
+import { SpiffCommerceClient } from '@spiffcommerce/core';
+import { SpiffCommerce3DPreviewService } from '@spiffcommerce/preview';
+import { ref, onMounted } from 'vue'
+
+const integrationProductId = '5141150b-8419-4e24-ae3f-9cab47a7920f'; // Sample Serving Board
+const workflowId = '3b09df2b-8808-4b1c-955a-d4172e706d11'; // Sample Serving Board Workflow
+
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+const client = new SpiffCommerceClient({});
+const initialize = async () => {
+    return await client.getWorkflowExperience(
+        undefined,
+        undefined,
+        (workflow) => {
+            return new SpiffCommerce3DPreviewService(workflow.globalPreviewConfig);
+        },
+        {
+            type: 'integration',
+            integrationProductId: integrationProductId,
+            workflowId: workflowId,
+        },
+    );
+};
+
+onMounted(() => {
+    initialize().then((experience) => {
+        if(!canvasRef.value) return;
+        experience.getWorkflowManager().getPreviewService().registerView(canvasRef.value);
+    });
+});
 </script>
 
 <template>
-    <header>
-        <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-        <div class="wrapper">
-            <HelloWorld msg="You did it!" />
-        </div>
-    </header>
-
-    <main>
-        <TheWelcome />
-    </main>
+    <canvas id="preview" ref="canvasRef"></canvas>
 </template>
 
 <style scoped>
-header {
-    line-height: 1.5;
-}
-
-.logo {
-    display: block;
-    margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-    header {
-        display: flex;
-        place-items: center;
-        padding-right: calc(var(--section-gap) / 2);
-    }
-
-    .logo {
-        margin: 0 2rem 0 0;
-    }
-
-    header .wrapper {
-        display: flex;
-        place-items: flex-start;
-        flex-wrap: wrap;
-    }
+#preview {
+    width: 100%;
+    height: 100%;
+    outline: none;
 }
 </style>
