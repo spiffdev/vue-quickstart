@@ -10,6 +10,7 @@ import inject from '@rollup/plugin-inject';
 export default defineConfig({
     build: {
         commonjsOptions: {
+            include: [],
             transformMixedEsModules: true,
         },
     },
@@ -32,6 +33,7 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
+        disabled: false,
         esbuildOptions: {
             // Node.js global to browser globalThis
             define: {
